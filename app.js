@@ -5,6 +5,7 @@ const placesRoutes = require("./routes/places-routes");
 const usersRoutes = require("./routes/users-routes");
 const app = express();
 const HttpError = require("./models/http-error");
+const { default: mongoose } = require("mongoose");
 app.use(bodyParser.json());
 
 app.use("/api/places", placesRoutes); // => /api/places/....
@@ -21,4 +22,14 @@ app.use((error, req, res, next) => {
   res.status(error.code || 500);
   res.json({ message: error.message || "An unknown error occured!!!" });
 });
-app.listen(5000);
+
+mongoose
+  .connect(
+    "mongodb+srv://admin:admin@cluster0.z7xwqbh.mongodb.net/places?retryWrites=true&w=majority"
+  )
+  .then(() => {
+    app.listen(5000);
+  })
+  .catch((err) => {
+    console.log(err);
+  });
