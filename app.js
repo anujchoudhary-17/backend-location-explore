@@ -8,6 +8,17 @@ const HttpError = require("./models/http-error");
 const { default: mongoose } = require("mongoose");
 app.use(bodyParser.json());
 
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+  );
+
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE");
+  next();
+});
+
 app.use("/api/places", placesRoutes); // => /api/places/....
 app.use("/api/users", usersRoutes); // => /api/users/....
 app.use((req, res, next) => {
@@ -25,7 +36,7 @@ app.use((error, req, res, next) => {
 
 mongoose
   .connect(
-    "mongodb+srv://admin:admin@cluster0.z7xwqbh.mongodb.net/places?retryWrites=true&w=majority"
+    "mongodb+srv://admin:admin@cluster0.z7xwqbh.mongodb.net/mern_project?retryWrites=true&w=majority"
   )
   .then(() => {
     app.listen(5000);
