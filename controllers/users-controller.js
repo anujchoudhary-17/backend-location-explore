@@ -77,7 +77,7 @@ const login = async (req, res, next) => {
   if (user.password === password) {
     res.json({ user: user.toObject({ getters: true }) });
   } else {
-    return next(new HttpError("Incorrect Password!!!", 401));
+    return next(new HttpError("Incorrect Password!", 401));
   }
 };
 
