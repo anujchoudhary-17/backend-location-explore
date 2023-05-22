@@ -3,6 +3,7 @@ const { v4: uuidv4 } = require("uuid");
 const { validationResult } = require("express-validator");
 const getCoordsForAddress = require("../util/location");
 const Place = require("../models/place");
+const fs = require("fs");
 
 const User = require("../models/user");
 const { default: mongoose } = require("mongoose");
@@ -73,13 +74,13 @@ const createPlace = async (req, res, next) => {
   } catch (error) {
     return next(error);
   }
+  console.log(coordinates);
   const createdPlace = new Place({
     title,
     description,
     address,
     location: coordinates,
-    image:
-      "https://s3-media0.fl.yelpcdn.com/bphoto/5L44X1Ma90dEKzdpWWv1gg/l.jpg",
+    image: req.file.path,
     creator,
   });
 
@@ -152,6 +153,9 @@ const deletePlace = async (req, res, next) => {
   let place;
   try {
     place = await Place.findById(placeId).populate("creator");
+    fs.unlink(place.image, (err) => {
+      console.log(err);
+    });
   } catch (err) {
     const error = new HttpError(
       "Something went wrong, could not find place.",
