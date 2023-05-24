@@ -66,7 +66,7 @@ const createPlace = async (req, res, next) => {
   if (!errors.isEmpty()) {
     next(new HttpError("Invalid inputs passed, please check your data.", 422));
   }
-  const { title, description, address, creator } = req.body;
+  const { title, description, address } = req.body;
 
   let coordinates;
   try {
@@ -74,23 +74,23 @@ const createPlace = async (req, res, next) => {
   } catch (error) {
     return next(error);
   }
-  console.log(coordinates);
   const createdPlace = new Place({
     title,
     description,
     address,
     location: coordinates,
     image: req.file.path,
-    creator,
+    creator: req.userData.userId,
   });
 
   let user;
   try {
-    user = await User.findById(creator);
+    user = await User.findById(req.userData.userId);
   } catch (err) {
     const error = new HttpError("Creating place failed, please try again", 500);
     return next(error);
   }
+
   if (!user) {
     const error = new HttpError("User does not exist for provided id", 404);
     return next(error);
@@ -133,6 +133,11 @@ const updatePlace = async (req, res, next) => {
 
     return next(error);
   }
+
+  if (place.creator.toString() !== req.userData.userId) {
+    const error = new HttpError("You are not allowed to edit this place.", 403);
+  }
+
   (place.title = title), (place.description = description);
 
   try {
@@ -151,11 +156,10 @@ const updatePlace = async (req, res, next) => {
 const deletePlace = async (req, res, next) => {
   const placeId = req.params.pid;
   let place;
+
   try {
     place = await Place.findById(placeId).populate("creator");
-    fs.unlink(place.image, (err) => {
-      console.log(err);
-    });
+    fs.unlink(place.image, (err) => {});
   } catch (err) {
     const error = new HttpError(
       "Something went wrong, could not find place.",
@@ -171,6 +175,13 @@ const deletePlace = async (req, res, next) => {
       500
     );
     return next(error);
+  }
+
+  if (place.creator.id !== req.userData.userId) {
+    const error = new HttpError(
+      "You are not allowed to delete this place.",
+      403
+    );
   }
 
   try {

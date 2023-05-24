@@ -33,9 +33,7 @@ app.use((req, res, next) => {
 
 app.use((error, req, res, next) => {
   if (req.file) {
-    fs.unlink(req.file.path, (err) => {
-      console.log(err);
-    });
+    fs.unlink(req.file.path, (err) => {});
   }
   if (res.headerSent) {
     return next(error);
@@ -46,7 +44,7 @@ app.use((error, req, res, next) => {
 
 mongoose
   .connect(
-    "mongodb+srv://admin:admin@cluster0.z7xwqbh.mongodb.net/mern_project?retryWrites=true&w=majority"
+    `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.z7xwqbh.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`
   )
   .then(() => {
     app.listen(5000);

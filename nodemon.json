@@ -1,0 +1,9 @@
+{
+    "env":{
+        "DB_USER":"admin",
+        "DB_PASSWORD":"admin",
+        "DB_NAME":"mern-prod",
+        "GOOGLE_API_KEY":"AIzaSyCyJKGXqffendNXaYAs_GPSq29WuZZ_QqQ",
+        "PRIVATE_JWT_KEY":"secret_key_dont_share"
+    }
+}
